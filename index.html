@@ -1,24 +1,1591 @@
-function scrollToSection(sectionId) {
-    const section = document.getElementById(sectionId);
-    if (section) {
-        // Scroll directly to section without jumping to top first
-        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-}
-
-function showPage(pageId) {
-    // Hide all pages
-    document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
-    });
-    
-    // Show the selected page
-    const targetPage = document.getElementById(pageId + '-page') || document.getElementById(pageId);
-    if (targetPage) {
-        targetPage.classList.add('active');
-        // Only scroll to top when explicitly navigating to home page
-        if (pageId === 'home') {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanket Kumar — MBA & Ex-Infosys Test Engineer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-    }
-}
+
+        :root {
+            --primary: #6B4F3E;
+            --secondary: #2F7D5B;
+            --background: #FFFFFF;
+            --card-bg: #F4EDE4;
+            --heading: #0F1724;
+            --body-text: #707B84;
+            --highlight1: #FFD166;
+            --highlight2: #C6B6F0;
+        }
+
+        body {
+            font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+            color: var(--body-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background: var(--background);
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Inter', 'Poppins', system-ui, sans-serif;
+            color: var(--heading);
+            line-height: 1.2;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--heading);
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Page Management */
+        .page {
+            display: none;
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            padding: 5rem 2rem 2rem;
+            position: relative;
+            background: linear-gradient(135deg, rgba(107,79,62,0.03) 0%, rgba(47,125,91,0.03) 100%);
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, var(--highlight2), transparent);
+            opacity: 0.1;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            margin-bottom: 1.5rem;
+            animation: slideUp 0.8s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-subheading {
+            font-size: 1.25rem;
+            color: var(--body-text);
+            margin-bottom: 3rem;
+            animation: slideUp 0.8s ease 0.2s both;
+        }
+
+        .stats-container {
+            display: flex;
+            gap: 3rem;
+            margin-bottom: 3rem;
+            animation: slideUp 0.8s ease 0.4s both;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--body-text);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+            animation: slideUp 0.8s ease 0.6s both;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 10px 30px rgba(107,79,62,0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(107,79,62,0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Section Styles */
+        section {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+
+        /* About Section */
+        .about-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .about-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .certifications {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+        }
+
+        .cert-list {
+            list-style: none;
+        }
+
+        .cert-list li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .cert-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        /* Experience Cards */
+        .experience-grid {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .exp-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .exp-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+        }
+
+        .exp-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .exp-header {
+            margin-bottom: 1rem;
+        }
+
+        .exp-role {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--heading);
+        }
+
+        .exp-company {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .exp-duration {
+            color: var(--body-text);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .exp-bullets {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .exp-bullets li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .exp-bullets li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+        }
+
+        .view-more-btn {
+            margin-top: 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .view-more-btn:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(107,79,62,0.3);
+        }
+
+        /* Detail Page Styles */
+        .detail-page {
+            padding: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            padding: 0.8rem 1.5rem;
+            background: var(--card-bg);
+            border: none;
+            border-radius: 8px;
+            color: var(--heading);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateX(-5px);
+        }
+
+        .detail-hero {
+            background: linear-gradient(135deg, var(--card-bg), rgba(47,125,91,0.05));
+            padding: 3rem;
+            border-radius: 20px;
+            margin-bottom: 3rem;
+        }
+
+        .detail-hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .detail-meta {
+            display: flex;
+            gap: 2rem;
+            color: var(--body-text);
+            font-size: 1.1rem;
+        }
+
+        .detail-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .detail-section {
+            margin-bottom: 3rem;
+        }
+
+        .detail-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--heading);
+            position: relative;
+            padding-left: 1rem;
+        }
+
+        .detail-section h2::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 80%;
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+        }
+
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .achievement-card {
+            background: white;
+            border: 1px solid rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .achievement-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .tech-badge {
+            background: var(--highlight1);
+            color: var(--heading);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            bottom: 10px;
+            width: 2px;
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border-radius: 10px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 1.5rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 3px solid white;
+        }
+
+        /* Projects Grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .project-card {
+            background: white;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
+            background: linear-gradient(45deg, transparent, rgba(107,79,62,0.05), transparent);
+            transition: all 0.5s ease;
+        }
+
+        .project-card:hover::before {
+            top: -150%;
+            left: -150%;
+            transform: rotate(45deg);
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .project-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--heading);
+        }
+
+        .project-summary {
+            color: var(--body-text);
+            margin-bottom: 1rem;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            background: var(--highlight1);
+            color: var(--heading);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* Skills */
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .skill-pill {
+            background: linear-gradient(135deg, var(--card-bg), white);
+            border: 2px solid var(--card-bg);
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .skill-pill:hover {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Education Timeline */
+        .education-timeline {
+            position: relative;
+            padding-left: 3rem;
+        }
+
+        .education-timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+        }
+
+        .edu-item {
+            position: relative;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border-radius: 10px;
+        }
+
+        .edu-item::before {
+            content: '';
+            position: absolute;
+            left: -38px;
+            top: 2rem;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 3px solid white;
+        }
+
+        .edu-degree {
+            font-weight: 700;
+            color: var(--heading);
+            font-size: 1.1rem;
+        }
+
+        .edu-institute {
+            color: var(--secondary);
+            margin: 0.5rem 0;
+        }
+
+        .edu-meta {
+            display: flex;
+            gap: 2rem;
+            color: var(--body-text);
+            font-size: 0.9rem;
+        }
+
+        /* Contact Section */
+        .contact {
+            background: linear-gradient(135deg, var(--card-bg), rgba(47,125,91,0.05));
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            background: white;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--heading);
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .social-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .stats-container {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+            }
+
+            .about-container {
+                grid-template-columns: 1fr;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-meta {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        /* Scroll animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    
+        /* Photo Placeholders */
+        .hero {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-image-container {
+            flex: 0 0 300px;
+            animation: fadeInRight 1s ease;
+        }
+
+        .profile-photo-placeholder {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            border: 5px solid var(--card-bg);
+        }
+
+        .profile-photo-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .photo-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(47, 125, 91, 0.9);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .profile-photo-placeholder:hover .photo-overlay {
+            opacity: 1;
+        }
+
+        .about-container {
+            display: grid;
+            grid-template-columns: 1fr 300px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .about-photo-placeholder {
+            position: relative;
+            width: 100%;
+            height: 350px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .about-photo-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .experience-card-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+        }
+
+        .experience-card-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .project-card-image {
+            width: 100%;
+            height: 200px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            background: var(--card-bg);
+        }
+
+        .project-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .project-card:hover .project-card-image img {
+            transform: scale(1.05);
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .hero-image-container {
+                flex: 0 0 250px;
+            }
+
+            .profile-photo-placeholder {
+                width: 250px;
+                height: 250px;
+            }
+
+            .about-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .about-photo-placeholder {
+                height: 300px;
+            }
+        }
+
+
+        /* Enhanced Hover Effects for All Cards */
+
+        /* Experience Cards */
+        .exp-card {
+            transition: all 0.3s ease;
+        }
+
+        .exp-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            border-color: #3498db;
+        }
+
+        /* Achievement Cards */
+        .achievement-card {
+            transition: all 0.3s ease;
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(52, 152, 219, 0.3);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        /* Project Cards */
+        .project-card {
+            transition: all 0.3s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        .project-card:hover .project-card-image {
+            transform: scale(1.1);
+        }
+
+        .project-card-image {
+            transition: transform 0.4s ease;
+        }
+
+        /* Experience Card Photo */
+        .experience-card-photo {
+            transition: all 0.3s ease;
+        }
+
+        .experience-card-photo:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo" onclick="showPage('home')">SK</div>
+            <ul class="nav-links">
+                <li><a onclick="showPage('home')">Home</a></li>
+                <li><a onclick="scrollToSection('about')">About</a></li>
+                <li><a onclick="scrollToSection('experience')">Experience</a></li>
+                <li><a onclick="scrollToSection('projects')">Projects</a></li>
+                <li><a onclick="scrollToSection('contact')">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Home Page -->
+    <div id="home-page" class="page active">
+        <!-- Hero Section -->
+        <section id="home" class="hero">
+            <div class="hero-image-container">
+                <div class="profile-photo-placeholder">
+                    <img src="profile-photo.jpg" alt="Sanket Kumar - MBA Student & Product Management Aspirant">
+                    <div class="photo-overlay">Add Your Profile Photo</div>
+                </div>
+            </div>
+
+            <div class="hero-content">
+                <h1>I'm Sanket — blending engineering and business to deliver impact.</h1>
+                <p class="hero-subheading">MBA at NMIMS Hyderabad • Ex-Infosys • Marketing & CSR Internships • Skilled in SQL, Power BI, Figma</p>
+                
+                <div class="stats-container">
+                    <div class="stat">
+                        <span class="stat-value">2.5</span>
+                        <span class="stat-label">Years at Infosys</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">2</span>
+                        <span class="stat-label">Internships</span>
+                    </div>
+                    <!--<div class="stat">
+                        <span class="stat-value">6+</span>
+                        <span class="stat-label">Projects</span>
+                    </div>
+                </div>-->
+
+                <div class="cta-buttons">
+                    <a onclick="scrollToSection('projects')" class="btn btn-primary">View My Work</a>
+                    <a href="#" class="btn btn-secondary">Download CV</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="fade-in">
+            <h2 class="section-title">About Me</h2>
+            <div class="about-container">
+                <div class="about-text">
+                    <p>From Patna, Bihar • MBA at NMIMS Hyderabad (7.4 CGPA) • B.Tech in CSE at Chitkara University (80%). Passionate about Brand Management, data-driven strategy, and product development. Hobbies: Basketball, Volleyball, F1, Traveling.</p>
+                </div>
+                <div class="about-photo-placeholder">
+                    <img src="about-photo.jpg" alt="Sanket Kumar - Professional Photo">
+                    <div class="photo-overlay">Add Professional Photo</div>
+                </div>
+
+                <div class="certifications">
+                    <h3>Certifications</h3>
+                    <ul class="cert-list">
+                        <li>ISTQB - Performance Testing (2019)</li>
+                        <li>PEGA Certified System Architect</li>
+                        <li>Coursera - Foundations of UX Design (2022)</li>
+                        <li>Coursera - Figma High Fidelity Designs (2022)</li>
+                        <li>Coursera - Build Dynamic UIs for Websites (2022)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience Section -->
+        <section id="experience" class="fade-in">
+            <h2 class="section-title">Experience</h2>
+            <div class="experience-grid">
+                <div class="exp-card" onclick="showPage('infosys-detail')">
+                    <div class="experience-card-photo">
+                        <img src="company-logo.png" alt="Company Logo">
+                        <div class="photo-overlay">Logo</div>
+                    </div>
+
+                    <div class="exp-header">
+                        <div class="exp-role">Test Engineer</div>
+                        <div class="exp-company">Infosys Ltd.</div>
+                        <div class="exp-duration">Oct 2019 – Feb 2022</div>
+                    </div>
+                    <ul class="exp-bullets">
+                        <li>Led testing of 3–5 releases per sprint across APAC & NA.</li>
+                        <li>Developed ETL test frameworks handling 1M+ transactions.</li>
+                        <li>Implemented Unix + SQL automation (10% faster cleanups).</li>
+                    </ul>
+                    <button class="view-more-btn">View Details <span>→</span></button>
+                </div>
+
+                <div class="exp-card" onclick="showPage('reliance-detail')">
+                    <div class="experience-card-photo">
+                        <img src="company-logo.png" alt="Company Logo">
+                        <div class="photo-overlay">Logo</div>
+                    </div>
+
+                    <div class="exp-header">
+                        <div class="exp-role">Marketing Intern</div>
+                        <div class="exp-company">Reliance Retail</div>
+                        <div class="exp-duration">Apr – Jun 2025</div>
+                    </div>
+                    <ul class="exp-bullets">
+                        <li>Managed brand communication for John Players & Lee Cooper.</li>
+                        <li>Executed 3-month social media content calendar using Meta Suite.</li>
+                    </ul>
+                    <button class="view-more-btn">View Details <span>→</span></button>
+                </div>
+
+                <div class="exp-card" onclick="showPage('apollo-detail')">
+                    <div class="experience-card-photo">
+                        <img src="company-logo.png" alt="Company Logo">
+                        <div class="photo-overlay">Logo</div>
+                    </div>
+
+                    <div class="exp-header">
+                        <div class="exp-role">CSR Intern</div>
+                        <div class="exp-company">Apollo Hospitals</div>
+                        <div class="exp-duration">Jan – Feb 2025</div>
+                    </div>
+                    <ul class="exp-bullets">
+                        <li>Researched healthcare upskilling programs across Punjab.</li>
+                        <li>Organized 7 medical camps serving 500+ participants.</li>
+                    </ul>
+                    <button class="view-more-btn">View Details <span>→</span></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="fade-in">
+            <h2 class="section-title">Projects</h2>
+            <div class="projects-grid">
+                <div class="project-card">
+                    <h3 class="project-title">Project Alpha — Automated Test Framework</h3>
+                    <p class="project-summary">Reduced regression cycles by 40% using scalable automation.</p>
+                    <div class="project-tags">
+                        <span class="tag">Testing</span>
+                        <span class="tag">Automation</span>
+                        <span class="tag">ETL</span>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <h3 class="project-title">Project Beta — Analytics Dashboard</h3>
+                    <p class="project-summary">Created SQL + Power BI dashboard for KPI tracking.</p>
+                    <div class="project-tags">
+                        <span class="tag">SQL</span>
+                        <span class="tag">Power BI</span>
+                        <span class="tag">Analytics</span>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <h3 class="project-title">Project Gamma — Social Media Analytics</h3>
+                    <p class="project-summary">Analyzed campaign KPIs for Reliance Retail brands.</p>
+                    <div class="project-tags">
+                        <span class="tag">Marketing</span>
+                        <span class="tag">Analytics</span>
+                        <span class="tag">Social Media</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="fade-in">
+            <h2 class="section-title">Skills</h2>
+            <div class="skills-container">
+                <span class="skill-pill">SQL</span>
+                <span class="skill-pill">Power BI</span>
+                <span class="skill-pill">Excel</span>
+                <span class="skill-pill">HTML</span>
+                <span class="skill-pill">Figma</span>
+                <span class="skill-pill">Linux</span>
+                <span class="skill-pill">Jira</span>
+                <span class="skill-pill">Agile & Waterfall</span>
+            </div>
+        </section>
+
+        <!-- Education Section -->
+        <section id="education" class="fade-in">
+            <h2 class="section-title">Education</h2>
+            <div class="education-timeline">
+                <div class="edu-item">
+                    <div class="edu-degree">MBA</div>
+                    <div class="edu-institute">NMIMS Hyderabad</div>
+                    <div class="edu-meta">
+                        <span>2024 – 2026</span>
+                        <span>7.40 CGPA</span>
+                    </div>
+                </div>
+
+                <div class="edu-item">
+                    <div class="edu-degree">B.Tech (CSE)</div>
+                    <div class="edu-institute">Chitkara University</div>
+                    <div class="edu-meta">
+                        <span>2015 – 2019</span>
+                        <span>80.06%</span>
+                    </div>
+                </div>
+
+                <div class="edu-item">
+                    <div class="edu-degree">XII – CBSE</div>
+                    <div class="edu-institute">Vikas Vidyaniketan, Vizag</div>
+                    <div class="edu-meta">
+                        <span>2015</span>
+                        <span>80.6%</span>
+                    </div>
+                </div>
+
+                <div class="edu-item">
+                    <div class="edu-degree">X – ICSE</div>
+                    <div class="edu-institute">Mount Carmel, Hoshiarpur</div>
+                    <div class="edu-meta">
+                        <span>2013</span>
+                        <span>86.8%</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="fade-in">
+            <div class="contact">
+                <h2 class="section-title">Let's Connect</h2>
+                <p>Ready to collaborate on your next project? Let's discuss how I can help deliver impact.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link">
+                        <span>📧</span> Email
+                    </a>
+                    <a href="#" class="social-link">
+                        <span>💼</span> LinkedIn
+                    </a>
+                    <a href="#" class="social-link">
+                        <span>💻</span> GitHub
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Infosys Detail Page -->
+    <div id="infosys-detail" class="page">
+        <div class="detail-page">
+            <button class="back-btn" onclick="showPage('home')">
+                <span>←</span> Back to Experience
+            </button>
+
+            <div class="detail-hero">
+                <h1>Test Engineer at Infosys</h1>
+                <div class="detail-meta">
+                    <span>📅 Oct 2019 – Feb 2022</span>
+                    <span>📍 Bangalore, India</span>
+                    <span>⏱️ 2 Years 5 Months</span>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h2>Role Overview</h2>
+                <p style="font-size: 1.1rem; line-height: 1.8;">
+                    As a Test Engineer at Infosys, I was responsible for ensuring the quality and reliability of enterprise-scale applications serving clients across APAC and North America. My role combined technical expertise in test automation with strategic thinking to optimize testing processes and deliver high-quality software releases.
+                </p>
+            </div>
+
+            <div class="detail-section">
+                <h2>Key Achievements</h2>
+                <div class="achievement-grid">
+                    <div class="achievement-card">
+                        <span class="achievement-number">40%</span>
+                        <span>Reduction in regression test cycles through automation</span>
+                    </div>
+                    <div class="achievement-card">
+                        <span class="achievement-number">1M+</span>
+                        <span>Transactions handled by ETL test framework</span>
+                    </div>
+                    <div class="achievement-card">
+                        <span class="achievement-number">3-5</span>
+                        <span>Releases tested per sprint across multiple regions</span>
+                    </div>
+                    <div class="achievement-card">
+                        <span class="achievement-number">10%</span>
+                        <span>Improvement in cleanup process efficiency</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h2>Responsibilities & Impact</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h4>Test Strategy & Leadership</h4>
+                        <p>Led comprehensive testing strategies for 3-5 releases per sprint, coordinating with cross-functional teams across APAC & North America to ensure seamless delivery.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>ETL Framework Development</h4>
+                        <p>Architected and developed robust ETL test frameworks capable of handling over 1 million transactions, significantly improving data validation accuracy and processing speed.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>Process Automation</h4>
+                        <p>Implemented Unix shell scripts combined with SQL automation, achieving 10% faster cleanup processes and reducing manual intervention by 60%.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>Performance Optimization</h4>
+                        <p>Defined and tracked KPIs for Ab Initio and SQL performance metrics, identifying bottlenecks and implementing optimizations that improved system response time by 25%.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>Stakeholder Communication</h4>
+                        <p>Presented performance test results and quality metrics to senior stakeholders, translating technical findings into actionable business insights.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h2>Technical Stack</h2>
+                <div class="tech-stack">
+                    <span class="tech-badge">SQL</span>
+                    <span class="tech-badge">Unix/Linux</span>
+                    <span class="tech-badge">Ab Initio</span>
+                    <span class="tech-badge">ETL Testing</span>
+                    <span class="tech-badge">Performance Testing</span>
+                    <span class="tech-badge">Test Automation</span>
+                    <span class="tech-badge">Jira</span>
+                    <span class="tech-badge">Agile/Scrum</span>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h2>Key Learnings</h2>
+                <p style="font-size: 1.1rem; line-height: 1.8;">
+                    My experience at Infosys taught me the importance of scalable testing solutions in enterprise environments. I developed strong problem-solving skills, learned to work effectively in distributed teams, and gained expertise in translating business requirements into comprehensive test strategies. This role laid the foundation for my transition into business strategy and consulting.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reliance Detail Page -->
+    <div id="reliance-detail" class="page">
+        <div class="detail-page">
+            <button class="back-btn" onclick="showPage('home')">
+                <span>←</span> Back to Experience
+            </button>
+
+            <div class="detail-hero">
+                <h1>Marketing Intern at Reliance Retail</h1>
+                <div class="detail-meta">
+                    <span>📅 Apr – Jun 2025</span>
+                    <span>📍 Mumbai, India</span>
+                    <span>⏱️ 3 Months</span>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h2>Role Overview</h2>
+                <p style="font-size: 1.1rem; line-height: 1.8;">
+                    As a Marketing Intern at Reliance Retail, I managed brand communication strategies for premium fashion brands John Players and Lee Cooper. This role provided hands-on experience in digital marketing, content creation, and brand management in India's largest retail ecosystem.
+                </p>
+            </div>
+
+            <div class="detail-section">
+                <h2>Key Achievements</h2>
+                <div class="achievement-grid">
+                    <div class="achievement-card">
+                        <span class="achievement-number">2</span>
+                        <span>Premium brands managed (John Players & Lee Cooper)</span>
+                    </div>
+                    <div class="achievement-card">
+                        <span class="achievement-number">3-Month</span>
+                        <span>Social media content calendar executed</span>
+                    </div>
+                    <div class="achievement-card">
+                        <span class="achievement-number">35%</span>
+                        <span>Increase in social media engagement</span>
+                    </div>
+                    <div class="achievement-card">
+                        <span class="achievement-number">5</span>
+                        <span>Successful photoshoots coordinated</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h2>Projects & Initiatives</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h4>Brand Communication Strategy</h4>
+                        <p>Developed and executed integrated marketing communication strategies for John Players and Lee Cooper, aligning brand messaging with target audience preferences and market trends.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>Social Media Management</h4>
+                        <p>Created and managed a comprehensive 3-month content calendar using Meta Business Suite, scheduling posts, stories, and campaigns across Instagram and Facebook platforms.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>Creative Production</h4>
+                        <p>Coordinated professional garment photoshoots, managing logistics, styling, and post-production to create compelling visual content for digital and print media.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>Trade Show Materials</h4>
+                        <p>Designed and produced marketing collaterals including brochures, standees, and digital presentations for trade shows, effectively communicating brand value propositions.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>Performance Analytics</h4>
+                        <p>Analyzed campaign performance using KPIs including reach, impressions, engagement rate, and follower growth, providing weekly reports with actionable insights.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h2>Skills Developed</h2>
+                <div class="tech-stack">
+                    <span class="tech-badge">Digital Marketing</span>
+                    <span class="tech-badge">Meta Business Suite</span>
+                    <span class="tech-badge">Content Creation</span>
+                    <span class="tech-badge">Brand Management</span>
+                    <span class="tech-badge">Analytics</span>
+                    <span class="tech-badge">Photoshoot Coordination</span>
+                    <span class="tech-badge">Canva</span>
+                    <span class="tech-badge">Social Media Strategy</span>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h2>Impact & Learning</h2>
+                <p style="font-size: 1.1rem; line-height: 1.8;">
+                    This internship provided invaluable exposure to retail marketing dynamics and consumer behavior in the fashion industry. I learned to balance creative vision with data-driven decision making, developed skills in multi-brand management, and gained insights into the fast-paced world of retail marketing. The experience strengthened my interest in brand strategy and consumer analytics.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Apollo Detail Page -->
+    <div id="apollo-detail" class="page">
+        <div class="detail-page">
+            <button class="back-btn" onclick="showPage('home')">
+                <span>←</span> Back to Experience
+            </button>
+
+            <div class="detail-hero">
+                <h1>CSR Intern at Apollo Hospitals</h1>
+                <div class="detail-meta">
+                    <span>📅 Jan – Feb 2025</span>
+                    <span>📍 Punjab, India</span>
+                    <span>⏱️ 2 Months</span>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h2>Role Overview</h2>
+                <p style="font-size: 1.1rem; line-height: 1.8;">
+                    As a CSR Intern at Apollo Hospitals, I contributed to healthcare accessibility initiatives and skill development programs across Punjab. This role combined research, community engagement, and strategic planning to enhance healthcare delivery to underserved populations.
+                </p>
+            </div>
+
+            <div class="detail-section">
+                <h2>Key Achievements</h2>
+                <div class="achievement-grid">
+                    <div class="achievement-card">
+                        <span class="achievement-number">50,000+</span>
+                        <span>Healthcare professionals impacted through research</span>
+                    </div>
+                    <div class="achievement-card">
+                        <span class="achievement-number">12+</span>
+                        <span>Hospitals surveyed for benchmarking</span>
+                    </div>
+                    <div class="achievement-card">
+                        <span class="achievement-number">7</span>
+                        <span>Medical camps organized</span>
+                    </div>
+                    <div class="achievement-card">
+                        <span class="achievement-number">500+</span>
+                        <span>Participants served in medical camps</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h2>Projects & Initiatives</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h4>Healthcare Upskilling Research</h4>
+                        <p>Conducted comprehensive research on healthcare professional development programs across Punjab, analyzing training needs and skill gaps affecting over 50,000 healthcare workers.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>Benchmarking Study</h4>
+                        <p>Collected and analyzed data from 12+ hospitals to benchmark best practices in healthcare delivery, training programs, and community outreach initiatives.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>Medical Camp Coordination</h4>
+                        <p>Successfully organized and executed 7 medical camps in rural and semi-urban areas, coordinating with local authorities, medical professionals, and volunteers.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>Community Health Services</h4>
+                        <p>Facilitated free health check-ups, diagnostic services, and medicine distribution to 500+ participants, focusing on preventive healthcare and health education.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>Strategic Recommendations</h4>
+                        <p>Developed actionable recommendations for Apollo MedSkills based on research findings, proposing innovative approaches to healthcare training and community engagement.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h2>Skills Developed</h2>
+                <div class="tech-stack">
+                    <span class="tech-badge">Research & Analysis</span>
+                    <span class="tech-badge">Community Engagement</span>
+                    <span class="tech-badge">Project Management</span>
+                    <span class="tech-badge">Data Collection</span>
+                    <span class="tech-badge">Healthcare Operations</span>
+                    <span class="tech-badge">Stakeholder Management</span>
+                    <span class="tech-badge">Report Writing</span>
+                    <span class="tech-badge">CSR Strategy</span>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h2>Impact & Learning</h2>
+                <p style="font-size: 1.1rem; line-height: 1.8;">
+                    This CSR internship deepened my understanding of healthcare challenges in India and the role of corporate social responsibility in addressing societal needs. I developed skills in community mobilization, learned to navigate complex stakeholder ecosystems, and gained insights into sustainable healthcare delivery models. The experience reinforced my commitment to creating social impact through business solutions.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Page Navigation
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show the selected page
+            const targetPage = document.getElementById(pageId + '-page') || document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+                // Only scroll to top when explicitly navigating to home page
+                if (pageId === 'home') {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }
+        }
+
+        // Scroll to section (for home page navigation)
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                // Scroll directly to section without jumping to top first
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+                }
+            }, 100);
+        }
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Fade in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Navigation background on scroll
+        window.addEventListener('scroll', function() {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.style.background = 'rgba(255, 255, 255, 0.98)';
+                nav.style.boxShadow = '0 4px 30px rgba(0,0,0,0.1)';
+            } else {
+                nav.style.background = 'rgba(255, 255, 255, 0.95)';
+                nav.style.boxShadow = '0 2px 20px rgba(0,0,0,0.08)';
+            }
+        });
+
+        // Add hover effect to cards
+        document.querySelectorAll('.project-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -3,21 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio</title>
+    <title>My Portfolio</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Your existing HTML content -->
-
+    <header>
+        <h1>Welcome to My Portfolio</h1>
+    </header>
+    <main>
+        <section id="projects">
+            <h2>Projects</h2>
+        </section>
+    </main>
+    <footer>
+        <p>© 2023 My Portfolio</p>
+    </footer>
+    <script src="smooth-scroll.js"></script>
     <script>
-function scrollToSection(sectionId) {
-    const section = document.getElementById(sectionId);
-    const navbar = document.querySelector('nav');
-    if (section && navbar) {
-        const navbarHeight = navbar.offsetHeight;
-        const sectionTop = section.getBoundingClientRect().top + window.pageYOffset - navbarHeight + 1;
-        window.scrollTo({ top: sectionTop, behavior: "smooth" });
-    }
-}
-</script>
+        // Smooth scroll script
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
 </body>
 </html>
